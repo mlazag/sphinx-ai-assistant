@@ -5,6 +5,7 @@ A Sphinx extension that adds AI assistant features to documentation pages,
 including markdown conversion, AI chat integration, and MCP support.
 """
 
+import json
 from pathlib import Path
 from typing import Any, Dict
 from sphinx.application import Sphinx
@@ -60,8 +61,26 @@ def add_ai_assistant_context(app: Sphinx, pagename: str, templatename: str,
         return
     
     # Add configuration to the page context
-    context['ai_assistant_config'] = {
+    config = {
         'position': app.config.ai_assistant_position,
         'content_selector': app.config.ai_assistant_content_selector,
         'features': app.config.ai_assistant_features,
     }
+    
+    context['ai_assistant_config'] = config
+    
+    # Inject configuration as inline script for JavaScript access
+    # This is added to the body of each page
+    if 'body' not in context:
+        context['body'] = ''
+    
+    config_script = f'''
+<script>
+window.AI_ASSISTANT_CONFIG = {json.dumps(config)};
+</script>
+'''
+    
+    # Add to metatags so it appears in the <head>
+    if 'metatags' not in context:
+        context['metatags'] = ''
+    context['metatags'] += config_script
