@@ -109,9 +109,9 @@
 .ai-assistant-dropdown {
     position: absolute;
     top: calc(100% + 0.2rem);
-    left: 0;
-    right: 0;
-    width: 210px;
+    left: auto;
+    right: auto;
+    width: 215px;
     background-color: var(--color-background-primary, #fff);
     border: 1px solid var(--color-foreground-border, #e1e4e5);
     border-radius: 4px;
@@ -247,9 +247,9 @@
     }
 
     .ai-assistant-dropdown {
-        right: auto;
-        left: 0;
-        min-width: 210px;
+        right: 0;
+        left: auto;
+        min-width: 215px;
     }
 
     .ai-assistant-notification {
@@ -293,7 +293,7 @@
 .sidebar-secondary .ai-assistant-dropdown {
     left: 0;
     right: auto;
-    min-width: 250px; /* Wider than button */
+    min-width: 215px;
 }
 
 /* Also fix focus outline for menu items */

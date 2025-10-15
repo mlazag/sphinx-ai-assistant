@@ -6,6 +6,7 @@ A Sphinx extension that adds AI-powered features to documentation pages, making 
 
 ### Markdown Export
 - **Copy as Markdown**: Convert any documentation page to Markdown format with a single click
+- **View as Markdown**: Open the markdown version of the current page in a new browser tab
 - Perfect for pasting into ChatGPT, Claude, or other AI tools
 - Preserves code blocks, headings, links, and formatting
 - Clean conversion that removes navigation, headers, and other non-content elements
@@ -57,7 +58,7 @@ sphinx-build -b html docs/ docs/_build/html
 
 That's it! The AI Assistant button will now appear on every page:
 - Main button: Copy page as Markdown
-- Dropdown: Copy page, Ask Claude, Ask ChatGPT
+- Dropdown: Copy page, View as Markdown, Ask Claude, Ask ChatGPT
 
 ### Configuration
 
@@ -80,6 +81,7 @@ ai_assistant_content_selector = 'article'
 # Enable/disable specific features (default: as shown)
 ai_assistant_features = {
     'markdown_export': True,  # Copy to clipboard
+    'view_markdown': True,    # View as Markdown in new tab
     'ai_chat': True,          # AI chat links
     'mcp_integration': False, # Not yet implemented
 }

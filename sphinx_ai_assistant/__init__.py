@@ -227,7 +227,8 @@ def setup(app: Sphinx) -> Dict[str, Any]:
     # Phase 2 configuration values - AI chat
     app.add_config_value('ai_assistant_features', {
         'markdown_export': True,
-        'ai_chat': True,  # Phase 2 - now enabled
+        'view_markdown': True,
+        'ai_chat': True,
         'mcp_integration': False,  # Phase 3
     }, 'html')
 

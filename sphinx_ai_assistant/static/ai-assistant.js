@@ -115,12 +115,23 @@
             dropdown.appendChild(exportItem);
         }
 
+        // View as Markdown
+        if (features.view_markdown) {
+            const viewItem = createMenuItem(
+                'view-markdown',
+                'View as Markdown',
+                'View this page as Markdown.',
+                `${staticPath}/markdown.svg`
+            );
+            dropdown.appendChild(viewItem);
+        }
+
         // AI chat integration
         if (features.ai_chat) {
             const providers = window.AI_ASSISTANT_CONFIG?.providers || {};
 
-            // Add a separator, if we have both features
-            if (features.markdown_export) {
+            // Add a separator, if we have markdown or view features
+            if (features.markdown_export || features.view_markdown) {
                 const separator = document.createElement('div');
                 separator.className = 'ai-assistant-menu-separator';
                 dropdown.appendChild(separator);
@@ -271,6 +282,14 @@
         if (copyMarkdownBtn) {
             copyMarkdownBtn.addEventListener('click', function() {
                 handleCopyMarkdown(false); // Regular notification
+            });
+        }
+
+        // Handle view markdown button
+        const viewMarkdownBtn = document.getElementById('ai-assistant-view-markdown');
+        if (viewMarkdownBtn) {
+            viewMarkdownBtn.addEventListener('click', function() {
+                handleViewMarkdown();
             });
         }
 
@@ -454,6 +473,18 @@
             console.error('AI Assistant: Failed to open AI chat:', error);
             showNotification('Failed to prepare AI chat. Please try again.', true);
         }
+    }
+
+    // Handle view as markdown
+    function handleViewMarkdown() {
+        const markdownUrl = getMarkdownUrl();
+        console.log('AI Assistant: Opening markdown URL:', markdownUrl);
+
+        // Open in new tab
+        window.open(markdownUrl, '_blank');
+
+        // Close dropdown
+        closeDropdown();
     }
 
     // Handle copy as markdown
