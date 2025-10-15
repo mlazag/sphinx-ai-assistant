@@ -29,6 +29,8 @@ license = "MIT"
 
 dependencies = [
     "sphinx",
+    "beautifulsoup4",
+    "markdownify",
 ]
 
 [project.urls]
@@ -44,7 +46,7 @@ Issues = "https://github.com/mlazag/sphinx-ai-assistant/issues"
 packages = ["sphinx_ai_assistant"]
 
 [tool.setuptools.package-data]
-sphinx_ai_assistant = ["static/*.css", "static/*.js, "static/*.svg"]
+sphinx_ai_assistant = ["static/*.css", "static/*.js", "static/*.svg"]
 
 [dependency-groups]
 dev = [

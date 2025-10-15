@@ -1,6 +1,6 @@
 /**
  * Sphinx AI Assistant Styles
- * 
+ *
  * Styles for the AI assistant dropdown and UI elements.
  * Designed to work well with Furo theme and be theme-agnostic where possible.
  */
@@ -113,7 +113,7 @@
     right: 0;
     width: 210px;
     background-color: var(--color-background-primary, #fff);
-    border: 1px solid var(--color-background-border, #e1e4e5);
+    border: 1px solid var(--color-foreground-border, #e1e4e5);
     border-radius: 4px;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     padding: 0.25rem;
@@ -187,6 +187,13 @@
     background-color: var(--color-background-active, #e8e8e8);
 }
 
+/* Menu separator */
+.ai-assistant-menu-separator {
+    height: 1px;
+    margin: 0.25rem 0;
+    background-color: var(--color-foreground-border, #e1e4e5);
+}
+
 /* Notification */
 .ai-assistant-notification {
     position: fixed;
@@ -214,73 +221,41 @@
     background-color: #e74c3c;
 }
 
+/* SVG icon styling */
+.svg-icon path {
+    stroke: var(--color-foreground-border, rgba(0, 0, 0, 0.2));
+}
+
+.svg-icon.filter-icon {
+    position: absolute;
+    left: 10px;
+    z-index: 1;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .ai-assistant-container {
         margin-bottom: 0.75rem;
     }
-    
+
     .ai-assistant-button {
         font-size: 0.8125rem;
     }
-    
+
     .ai-assistant-button-text {
         display: none;
     }
-    
+
     .ai-assistant-dropdown {
         right: auto;
         left: 0;
         min-width: 210px;
     }
-    
+
     .ai-assistant-notification {
         left: 1rem;
         right: 1rem;
         text-align: center;
-    }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    .ai-assistant-button {
-        border-color: rgba(255, 255, 255, 0.2);
-    }
-    
-    .ai-assistant-button-main,
-    .ai-assistant-button-dropdown {
-        color: var(--color-foreground-primary, #e8e8e8);
-    }
-    
-    .ai-assistant-button-divider {
-        background-color: rgba(255, 255, 255, 0.2);
-    }
-    
-    .ai-assistant-button-main:hover,
-    .ai-assistant-button-dropdown:hover {
-        background-color: rgba(255, 255, 255, 0.05);
-    }
-    
-    .ai-assistant-button-main:active,
-    .ai-assistant-button-dropdown:active {
-        background-color: rgba(255, 255, 255, 0.1);
-    }
-    
-    .ai-assistant-dropdown {
-        background-color: var(--color-background-primary, #1e1e1e);
-        border-color: var(--color-background-border, #3a3a3a);
-    }
-    
-    .ai-assistant-menu-item {
-        color: var(--color-foreground-primary, #e8e8e8);
-    }
-    
-    .ai-assistant-menu-item:hover {
-        background-color: var(--color-background-hover, #2a2a2a);
-    }
-    
-    .ai-assistant-menu-item-description {
-        color: var(--color-foreground-secondary, #aaa);
     }
 }
 
