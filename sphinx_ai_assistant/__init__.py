@@ -127,7 +127,7 @@ def generate_markdown_files(app: Sphinx, exception):
 
             # Try different selectors based on common Sphinx themes
             selectors = [
-                'article[role="main"]',  # Furo theme
+                'article[role="main"]',   # Furo theme
                 'div[role="main"]',       # Many themes
                 'div.document',           # Classic theme
                 'main',                   # Generic HTML5
@@ -212,24 +212,24 @@ def setup(app: Sphinx) -> Dict[str, Any]:
     Returns:
         Extension metadata
     """
-    # Phase 1 configuration values
+    # Enabling extension
     app.add_config_value('ai_assistant_enabled', True, 'html')
-    app.add_config_value('ai_assistant_position', 'sidebar', 'html')  # 'sidebar' or 'title'
+    app.add_config_value('ai_assistant_position', 'sidebar', 'html')
     app.add_config_value('ai_assistant_content_selector', 'article', 'html')
 
-    # Phase 2 configuration values - markdown generation
+    # Markdown generation
     app.add_config_value('ai_assistant_generate_markdown', True, 'html')
     app.add_config_value('ai_assistant_markdown_exclude_patterns',
                          ['genindex', 'search', 'py-modindex'], 'html')
     app.add_config_value('ai_assistant_generate_llms_txt', True, 'html')
     app.add_config_value('ai_assistant_base_url', '', 'html')
 
-    # Phase 2 configuration values - AI chat
+    # Enabling extension options
     app.add_config_value('ai_assistant_features', {
         'markdown_export': True,
         'view_markdown': True,
         'ai_chat': True,
-        'mcp_integration': False,  # Phase 3
+        'mcp_integration': True,
     }, 'html')
 
     # AI provider configuration
@@ -238,7 +238,7 @@ def setup(app: Sphinx) -> Dict[str, Any]:
             'enabled': True,
             'label': 'Ask Claude',
             'description': 'Open AI chat with this page context',
-            'icon': 'comment-discussion-16.svg',
+            'icon': 'claude.svg',
             'url_template': 'https://claude.ai/new?q={prompt}',
             'prompt_template': 'Hi! Please read this documentation page: {url}\n\nI have questions about it.',
         },
@@ -246,7 +246,7 @@ def setup(app: Sphinx) -> Dict[str, Any]:
             'enabled': True,
             'label': 'Ask ChatGPT',
             'description': 'Open AI chat with this page context',
-            'icon': 'comment-discussion-16.svg',
+            'icon': 'chatgpt.svg',
             'url_template': 'https://chatgpt.com/?q={prompt}',
             'prompt_template': 'Read {url} so I can ask questions about it.',
         },
@@ -254,7 +254,7 @@ def setup(app: Sphinx) -> Dict[str, Any]:
             'enabled': False,
             'label': 'Custom AI',
             'description': 'Open AI chat with this page context',
-            'icon': 'comment-discussion-16.svg',
+            'icon': 'comment-discussion.svg',
             'url_template': 'https://your-ai.com/chat?q={prompt}',
             'prompt_template': 'Read {url} and answer my questions about it.',
         }
@@ -263,6 +263,28 @@ def setup(app: Sphinx) -> Dict[str, Any]:
     # Fallback configuration
     app.add_config_value('ai_assistant_use_pregenerated_markdown', True, 'html')
     app.add_config_value('ai_assistant_max_content_length', 4000, 'html')
+
+    # MCP tools configuration
+    app.add_config_value('ai_assistant_mcp_tools', {
+        'vscode': {
+            'enabled': False,
+            'type': 'vscode',
+            'label': 'Connect to VS Code',
+            'description': 'Install MCP server in VS Code',
+            'icon': 'vscode.svg',
+            'server_name': '',
+            'server_url': '',
+            'transport': 'sse',
+        },
+        'claude_desktop': {
+            'enabled': False,
+            'type': 'claude_desktop',
+            'label': 'Connect to Claude',
+            'description': 'Download and install MCP extension',
+            'icon': 'claude.svg',
+            'mcpb_url': '',
+        },
+    }, 'html')
 
     # Get the path to our static files
     static_path = Path(__file__).parent / 'static'
@@ -301,6 +323,7 @@ def add_ai_assistant_context(app: Sphinx, pagename: str, templatename: str,
         'content_selector': app.config.ai_assistant_content_selector,
         'features': app.config.ai_assistant_features,
         'providers': app.config.ai_assistant_providers,
+        'mcp_tools': app.config.ai_assistant_mcp_tools,
         'usePreGeneratedMarkdown': app.config.ai_assistant_use_pregenerated_markdown,
         'maxContentLength': app.config.ai_assistant_max_content_length,
         'baseUrl': app.config.html_baseurl or app.config.ai_assistant_base_url or '',

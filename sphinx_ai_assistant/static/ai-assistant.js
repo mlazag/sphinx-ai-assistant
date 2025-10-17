@@ -4,6 +4,7 @@
  * Provides AI-powered features for Sphinx documentation pages.
  * - Markdown export functionality
  * - AI chat integration with pre-filled context
+ * - MCP tool integration
  */
 
 (function() {
@@ -68,12 +69,12 @@
 
         container.innerHTML = `
             <button class="ai-assistant-button-main" id="ai-assistant-button-main" type="button">
-                <img src="${staticPath}/copy-to-clipboard-16.svg" class="ai-assistant-icon" aria-hidden="true" alt="">
+                <img src="${staticPath}/copy-to-clipboard.svg" class="ai-assistant-icon" aria-hidden="true" alt="">
                 <span class="ai-assistant-button-text">Copy page</span>
             </button>
             <span class="ai-assistant-button-divider"></span>
             <button class="ai-assistant-button-dropdown" id="ai-assistant-button-dropdown" type="button" aria-label="More options" aria-expanded="false" aria-haspopup="true">
-                <img src="${staticPath}/arrow-down-16.svg" class="ai-assistant-dropdown-icon" aria-hidden="true" alt="">
+                <img src="${staticPath}/arrow-down.svg" class="ai-assistant-dropdown-icon" aria-hidden="true" alt="">
             </button>
         `;
 
@@ -110,7 +111,7 @@
                 'copy-markdown',
                 'Copy page',
                 'Copy this page as Markdown for LLMs.',
-                `${staticPath}/copy-to-clipboard-16.svg`
+                `${staticPath}/copy-to-clipboard.svg`
             );
             dropdown.appendChild(exportItem);
         }
@@ -140,8 +141,8 @@
             // Add AI provider menu items
             Object.entries(providers).forEach(([key, provider]) => {
                 if (provider.enabled) {
-                    const description = provider.description || 'Open AI chat with this page context';
-                    const icon = provider.icon || 'comment-discussion-16.svg';
+                    const description = provider.description || 'Open AI chat with this page context.';
+                    const icon = provider.icon || 'comment-discussion.svg';
                     const iconPath = icon.startsWith('http') ? icon : `${staticPath}/${icon}`;
 
                     const aiItem = createMenuItem(
@@ -152,6 +153,36 @@
                     );
                     aiItem.dataset.provider = key;
                     dropdown.appendChild(aiItem);
+                }
+            });
+        }
+
+        // MCP integration
+        if (features.mcp_integration) {
+            const mcpTools = window.AI_ASSISTANT_CONFIG?.mcp_tools || {};
+
+            // Add separator if we have AI chat or markdown features
+            if (features.ai_chat || features.markdown_export || features.view_markdown) {
+                const separator = document.createElement('div');
+                separator.className = 'ai-assistant-menu-separator';
+                dropdown.appendChild(separator);
+            }
+
+            // Add MCP tool menu items
+            Object.entries(mcpTools).forEach(([key, tool]) => {
+                if (tool.enabled) {
+                    const description = tool.description || 'Install MCP server';
+                    const icon = tool.icon || 'ai-tools.svg';
+                    const iconPath = icon.startsWith('http') ? icon : `${staticPath}/${icon}`;
+
+                    const mcpItem = createMenuItem(
+                        `mcp-${key}`,
+                        tool.label,
+                        description,
+                        iconPath
+                    );
+                    mcpItem.dataset.mcpTool = key;
+                    dropdown.appendChild(mcpItem);
                 }
             });
         }
@@ -301,6 +332,15 @@
                 handleAIChat(provider);
             });
         });
+
+        // Handle MCP tool menu items
+        const mcpButtons = dropdown.querySelectorAll('[id^="ai-assistant-mcp-"]');
+        mcpButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const toolKey = this.dataset.mcpTool;
+                handleMCPInstall(toolKey);
+            });
+        });
     }
 
     // Convert HTML to Markdown
@@ -421,6 +461,87 @@
         return { type: 'markdown', content: markdown };
     }
 
+    // Handle MCP tool installation
+    function handleMCPInstall(toolKey) {
+        console.log('AI Assistant: Installing MCP tool:', toolKey);
+
+        try {
+            const mcpTools = window.AI_ASSISTANT_CONFIG?.mcp_tools || {};
+            const tool = mcpTools[toolKey];
+
+            if (!tool) {
+                console.error('AI Assistant: MCP tool not found:', toolKey);
+                showNotification('MCP tool configuration not found', true);
+                return;
+            }
+
+            // Handle Claude Desktop with .mcpb file
+            if (tool.type === 'claude_desktop') {
+                if (!tool.mcpb_url) {
+                    console.error('AI Assistant: No mcpb_url configured for Claude Desktop');
+                    showNotification('Claude Desktop configuration missing', true);
+                    return;
+                }
+
+                console.log('AI Assistant: Downloading .mcpb file:', tool.mcpb_url);
+
+                // Create temporary link and trigger download
+                const link = document.createElement('a');
+                link.href = tool.mcpb_url;
+                link.download = ''; // Let browser use filename from URL
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                showNotification('Downloading MCP extension. Open the file to install in Claude Desktop.');
+                closeDropdown();
+                return;
+            }
+
+            // Handle VS Code with vscode: URL
+            if (tool.type === 'vscode') {
+                // Build MCP configuration JSON
+                const mcpConfig = {
+                    name: tool.server_name || toolKey,
+                    type: tool.transport || 'sse',
+                };
+
+                // Add URL or command based on transport type
+                if (tool.transport === 'stdio') {
+                    mcpConfig.command = tool.command;
+                    if (tool.args) {
+                        mcpConfig.args = tool.args;
+                    }
+                } else {
+                    // Default to SSE/HTTP
+                    mcpConfig.url = tool.server_url;
+                }
+
+                // Generate VS Code installation URL
+                const jsonString = JSON.stringify(mcpConfig);
+                const encoded = encodeURIComponent(jsonString);
+                const installUrl = `vscode:mcp/install?${encoded}`;
+
+                console.log('AI Assistant: Opening installation URL:', installUrl);
+
+                // Open the installation URL
+                window.open(installUrl, '_self');
+
+                // Close dropdown
+                closeDropdown();
+                return;
+            }
+
+            // Unknown tool type
+            console.error('AI Assistant: Unknown MCP tool type:', tool.type);
+            showNotification('Unknown MCP tool type', true);
+
+        } catch (error) {
+            console.error('AI Assistant: Failed to install MCP tool:', error);
+            showNotification('Failed to install MCP tool. Please try again.', true);
+        }
+    }
+
     // Handle AI chat integration
     async function handleAIChat(providerKey) {
         console.log('AI Assistant: Opening AI chat with provider:', providerKey);
@@ -534,7 +655,7 @@
 
         // Change button to show checkmark and "Copied"
         mainButton.innerHTML = `
-            <img src="${staticPath}/checked-16.svg" class="ai-assistant-icon" aria-hidden="true" alt="">
+            <img src="${staticPath}/checked.svg" class="ai-assistant-icon" aria-hidden="true" alt="">
             <span class="ai-assistant-button-text">Copied</span>
         `;
         mainButton.classList.add('ai-assistant-button-success');

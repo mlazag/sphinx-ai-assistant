@@ -25,8 +25,9 @@ ai_assistant_content_selector = 'article'
 # Feature flags
 ai_assistant_features = {
     'markdown_export': True,    # Copy to clipboard
+    'view_markdown': True,      # View as Markdown in new tab
     'ai_chat': False,           # AI chat integration
-    'mcp_integration': False,   # Not yet implemented
+    'mcp_integration': False,   # MCP tool installation
 }
 
 # Build-time markdown generation from topics
@@ -50,7 +51,7 @@ ai_assistant_providers = {
         'enabled': True,
         'label': 'Ask Claude',
         'description': 'Ask Claude about this topic.',
-        'icon': 'anthropic-logo.svg',
+        'icon': 'claude.svg',
         'url_template': 'https://claude.ai/new?q={prompt}',
         'prompt_template': 'Get familiar with the documentation content at {url} so that I can ask questions about it.',
     },
@@ -58,7 +59,7 @@ ai_assistant_providers = {
         'enabled': True,
         'label': 'Ask ChatGPT',
         'description': 'Ask ChatGPT about this topic.',
-        'icon': 'chatgpt-logo.svg',
+        'icon': 'chatgpt.svg',
         'url_template': 'https://chatgpt.com/?q={prompt}',
         'prompt_template': 'Get familiar with the documentation content at {url} so that I can ask questions about it.',
     },
@@ -75,3 +76,25 @@ ai_assistant_providers = {
 ai_assistant_use_pregenerated_markdown = True
 # Number of characters when content is too long for embedding in URL
 ai_assistant_max_content_length = 4000
+
+# MCP tools configuration
+ai_assistant_mcp_tools = {
+    'vscode': {
+        'enabled': True,
+        'type': 'vscode',
+        'label': 'Connect to VS Code',
+        'description': 'Install MCP server to VS Code.',
+        'icon': 'vscode.svg',
+        'server_name': 'kanzi-v3-9',
+        'server_url': 'https://kanzi-docs-mcp-v3-9.bravemeadow-3399f39c.westeurope.azurecontainerapps.io/sse',
+        'transport': 'sse',  # 'sse' or 'stdio'
+    },
+    'claude_desktop': {
+        'enabled': True,
+        'type': 'claude_desktop',
+        'label': 'Connect to Claude',
+        'description': 'Download and run the Claude mcpb.',
+        'icon': 'claude.svg',
+        'mcpb_url': 'https://docs.example.com/_static/kanzi-v3-9.mcpb',
+    },
+}
