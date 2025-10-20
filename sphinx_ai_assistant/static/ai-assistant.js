@@ -471,29 +471,27 @@
 
             if (!tool) {
                 console.error('AI Assistant: MCP tool not found:', toolKey);
-                showNotification('MCP tool configuration not found', true);
+                showNotification('MCP tool configuration not found.', true);
                 return;
             }
 
             // Handle Claude Desktop with .mcpb file
             if (tool.type === 'claude_desktop') {
-                if (!tool.mcpb_url) {
-                    console.error('AI Assistant: No mcpb_url configured for Claude Desktop');
-                    showNotification('Claude Desktop configuration missing', true);
-                    return;
-                }
+                const mcpbUrl = tool.mcpb_url;
 
-                console.log('AI Assistant: Downloading .mcpb file:', tool.mcpb_url);
+                // Extract filename from URL
+                const urlPath = new URL(mcpbUrl).pathname;
+                const filename = urlPath.split('/').pop();
 
-                // Create temporary link and trigger download
-                const link = document.createElement('a');
-                link.href = tool.mcpb_url;
-                link.download = ''; // Let browser use filename from URL
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                // Direct download - no fetch needed
+                const downloadLink = document.createElement('a');
+                downloadLink.href = mcpbUrl;
+                downloadLink.download = filename;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
 
-                showNotification('Downloading MCP extension. Open the file to install in Claude Desktop.');
+                showNotification('MCP tool download started.');
                 closeDropdown();
                 return;
             }
@@ -534,7 +532,7 @@
 
             // Unknown tool type
             console.error('AI Assistant: Unknown MCP tool type:', tool.type);
-            showNotification('Unknown MCP tool type', true);
+            showNotification('Unknown MCP tool type.', true);
 
         } catch (error) {
             console.error('AI Assistant: Failed to install MCP tool:', error);
@@ -553,7 +551,7 @@
 
             if (!provider) {
                 console.error('AI Assistant: Provider not found:', providerKey);
-                showNotification('AI provider configuration not found', true);
+                showNotification('AI provider configuration not found.', true);
                 return;
             }
 
@@ -618,7 +616,7 @@
             })
             .catch(error => {
                 console.error('AI Assistant: Failed to convert to markdown:', error);
-                showNotification('Failed to convert page to markdown', true);
+                showNotification('Failed to convert page to markdown.', true);
             });
     }
 
@@ -685,7 +683,7 @@
             }
         } catch (err) {
             console.error('Fallback copy failed:', err);
-            showNotification('Failed to copy to clipboard', true);
+            showNotification('Failed to copy to clipboard.', true);
         }
 
         document.body.removeChild(textarea);

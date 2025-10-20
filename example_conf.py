@@ -95,6 +95,6 @@ ai_assistant_mcp_tools = {
         'label': 'Connect to Claude',
         'description': 'Download and run the Claude mcpb.',
         'icon': 'claude.svg',
-        'mcpb_url': 'https://docs.example.com/_static/kanzi-v3-9.mcpb',
+        'mcpb_url': 'https://docs.example.com/_static/kanzi-v3-9.zip',
     },
 }
