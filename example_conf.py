@@ -85,8 +85,8 @@ ai_assistant_mcp_tools = {
         'label': 'Connect to VS Code',
         'description': 'Install MCP server to VS Code.',
         'icon': 'vscode.svg',
-        'server_name': 'kanzi-v3-9',
-        'server_url': 'https://kanzi-docs-mcp-v3-9.bravemeadow-3399f39c.westeurope.azurecontainerapps.io/sse',
+        'server_name': 'your-docs-mcp-server',
+        'server_url': 'https://your-docs-mcp-server/sse',
         'transport': 'sse',  # 'sse' or 'stdio'
     },
     'claude_desktop': {
@@ -95,6 +95,6 @@ ai_assistant_mcp_tools = {
         'label': 'Connect to Claude',
         'description': 'Download and run the Claude mcpb.',
         'icon': 'claude.svg',
-        'mcpb_url': 'https://docs.example.com/_static/kanzi-v3-9.zip',
+        'mcpb_url': 'https://docs.example.com/_static/your-mcpb-config.zip',
     },
 }

@@ -11,15 +11,13 @@ A Sphinx extension that adds AI-powered features to documentation pages, making 
 - Preserves code blocks, headings, links, and formatting
 - Clean conversion that removes navigation, headers, and other non-content elements
 
-### Using AI providers
+### Integration with AI tools
 - **Direct AI Chat Links**: Open ChatGPT or Claude with pre-filled documentation context
 - **Smart Content Strategy**: Uses pre-generated markdown files for clean, unlimited-length context
 - **JavaScript Fallback**: Works even without build-time markdown generation
 - **Customizable AI Providers**: Built-in support for Claude, ChatGPT, and custom AI services
 - **No Backend Required**: Pure static files, works on any hosting
-
-### Coming soon
-- **Phase 3**: MCP (Model Context Protocol) integration for seamless AI tool connections
+- **MCP (Model Context Protocol) integration**: Connect VS Code and Claude to your MCP
 
 ## Installation
 
@@ -58,9 +56,16 @@ sphinx-build -b html docs/ docs/_build/html
 
 That's it! The AI Assistant button will now appear on every page:
 - Main button: Copy page as Markdown
-- Dropdown: Copy page, View as Markdown, Ask Claude, Ask ChatGPT
+- Dropdown:
+  - Copy or view page as Markdown
+  - Ask Claude and ChatGPT
+  - Connect to MCP server in VS Code and Claude Desktop
+
+![sphinx-ai-assistant.png](sphinx-ai-assistant.png)
 
 ### Configuration
+
+For details, see [example_conf.py](example_conf.py)
 
 You can customize the extension in your `conf.py`:
 
@@ -209,16 +214,6 @@ sphinx-ai-assistant/
 └── README.md                 # This file
 ```
 
-### Running Tests
-
-```bash
-# Install development dependencies
-pip install -e ".[dev]"
-
-# Run tests (when added)
-pytest
-```
-
 ### Building Documentation
 
 ```bash
@@ -313,10 +308,10 @@ Contributions are welcome! This is a young project and there are many ways to he
   - [x] ChatGPT integration
   - [x] Custom AI provider support
   - [x] llms.txt generation
-- [ ] **Phase 3**: MCP integration
-  - Auto-generate MCP server configurations
-  - Deep links for Cursor, VS Code, Claude Desktop
-  - Documentation context injection
+- [x] **Phase 3**: MCP integration
+  - [ ] Auto-generate MCP server configurations
+  - [x] Deep links for VS Code, Claude Desktop
+  - [ ] Documentation context injection
 
 ## License
 
