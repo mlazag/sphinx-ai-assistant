@@ -290,29 +290,6 @@ Solution: Generate `.md` files with `ai_assistant_generate_markdown = True`
 - Markdown files are 40-60% smaller than HTML
 - Example: 45 KB HTML → 18 KB Markdown
 
-## Contributing
-
-Contributions are welcome! This is a young project and there are many ways to help:
-
-- Report bugs or suggest features via [GitHub Issues](https://github.com/mlazag/sphinx-ai-assistant/issues)
-- Improve documentation
-- Add support for more Sphinx themes
-
-## Roadmap
-
-- [x] **Phase 1**: Markdown export functionality
-- [x] **Phase 2**: AI chat integration
-  - [x] Build-time markdown generation
-  - [x] JavaScript fallback
-  - [x] Claude integration
-  - [x] ChatGPT integration
-  - [x] Custom AI provider support
-  - [x] llms.txt generation
-- [x] **Phase 3**: MCP integration
-  - [ ] Auto-generate MCP server configurations
-  - [x] Deep links for VS Code, Claude Desktop
-  - [ ] Documentation context injection
-
 ## License
 
 MIT License - see LICENSE file for details
@@ -326,6 +303,6 @@ MIT License - see LICENSE file for details
 
 ## Questions or Issues?
 
-- Check the [documentation](https://github.com/mlazag/sphinx-ai-assistant)
+- Check the [example_conf.py](example_conf.py)
 - Open an [issue](https://github.com/mlazag/sphinx-ai-assistant/issues)
 - Start a [discussion](https://github.com/mlazag/sphinx-ai-assistant/discussions)
