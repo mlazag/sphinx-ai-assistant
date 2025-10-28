@@ -132,11 +132,6 @@ ai_assistant_providers = {
         'prompt_template': 'Analyze this documentation: {url}',
     },
 }
-
-# AI provider fallback configuration in case of content too long for URL embedding
-ai_assistant_use_pregenerated_markdown = True
-# Number of characters when content is too long for embedding in URL
-ai_assistant_max_content_length = 4000
 ```
 
 ## How It Works

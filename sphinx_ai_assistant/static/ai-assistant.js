@@ -422,32 +422,6 @@
         }
     }
 
-    // Get content for AI (either URL or markdown)
-    async function getContentForAI() {
-        const config = window.AI_ASSISTANT_CONFIG || {};
-
-        // Strategy 1: Try to use pre-generated .md file (fastest, cleanest)
-        if (config.usePreGeneratedMarkdown !== false) {
-            const markdownUrl = getMarkdownUrl();
-
-            try {
-                // Quick HEAD request to check if .md exists
-                const response = await fetch(markdownUrl, { method: 'HEAD' });
-                if (response.ok) {
-                    console.log('AI Assistant: Using pre-generated markdown file:', markdownUrl);
-                    return { type: 'url', content: markdownUrl };
-                }
-            } catch (e) {
-                // .md file doesn't exist, fall through to JS conversion
-                console.debug('AI Assistant: Pre-generated markdown not found, using JS conversion');
-            }
-        }
-
-        // Strategy 2: Fall back to JS conversion
-        const markdown = await convertToMarkdown();
-        return { type: 'markdown', content: markdown };
-    }
-
     // Handle MCP tool installation
     function handleMCPInstall(toolKey) {
         console.log('AI Assistant: Installing MCP tool:', toolKey);
@@ -532,7 +506,6 @@
         console.log('AI Assistant: Opening AI chat with provider:', providerKey);
 
         try {
-            const contentData = await getContentForAI();
             const providers = window.AI_ASSISTANT_CONFIG?.providers || {};
             const provider = providers[providerKey];
 
@@ -542,32 +515,15 @@
                 return;
             }
 
-            let prompt;
-            if (contentData.type === 'url') {
-                // Use the clean .md URL
-                prompt = provider.prompt_template.replace('{url}', contentData.content);
-            } else {
-                // Embed the markdown content (with length check)
-                const markdown = contentData.content;
-                const maxLength = window.AI_ASSISTANT_CONFIG?.maxContentLength || 4000;
+            // Get the markdown URL for this page
+            const markdownUrl = getMarkdownUrl();
 
-                if (markdown.length > maxLength) {
-                    // Content too long, truncate with warning
-                    const truncated = markdown.substring(0, maxLength);
-                    const currentUrl = window.location.href;
-                    prompt = `Here is documentation content (truncated due to length, full version at ${currentUrl}):\n\n${truncated}...\n\nI have questions about this.`;
-                    console.warn('AI Assistant: Content truncated from', markdown.length, 'to', maxLength, 'characters');
-                } else {
-                    // Content fits, include it all
-                    prompt = `Here is documentation content:\n\n${markdown}\n\nI have questions about this.`;
-                }
-            }
-
-            // Build the final URL
+            // Use the provider's prompt template with the URL
+            const prompt = provider.prompt_template.replace('{url}', markdownUrl);
             const encodedPrompt = encodeURIComponent(prompt);
             const aiUrl = provider.url_template.replace('{prompt}', encodedPrompt);
 
-            console.log('AI Assistant: Opening URL:', aiUrl.substring(0, 100) + '...');
+            console.log('AI Assistant: Opening URL:', aiUrl);
 
             // Open in new tab
             window.open(aiUrl, '_blank');
@@ -577,7 +533,7 @@
 
         } catch (error) {
             console.error('AI Assistant: Failed to open AI chat:', error);
-            showNotification('Failed to prepare AI chat. Please try again.', true);
+            showNotification('Failed to open AI chat. Please try again.', true);
         }
     }
 

@@ -260,10 +260,6 @@ def setup(app: Sphinx) -> Dict[str, Any]:
         }
     }, 'html')
 
-    # Fallback configuration
-    app.add_config_value('ai_assistant_use_pregenerated_markdown', True, 'html')
-    app.add_config_value('ai_assistant_max_content_length', 4000, 'html')
-
     # MCP tools configuration
     app.add_config_value('ai_assistant_mcp_tools', {
         'vscode': {
@@ -324,8 +320,6 @@ def add_ai_assistant_context(app: Sphinx, pagename: str, templatename: str,
         'features': app.config.ai_assistant_features,
         'providers': app.config.ai_assistant_providers,
         'mcp_tools': app.config.ai_assistant_mcp_tools,
-        'usePreGeneratedMarkdown': app.config.ai_assistant_use_pregenerated_markdown,
-        'maxContentLength': app.config.ai_assistant_max_content_length,
         'baseUrl': app.config.html_baseurl or app.config.ai_assistant_base_url or '',
     }
 
