@@ -8,7 +8,7 @@ including markdown conversion, AI chat integration, and MCP support.
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List, Tuple
 from sphinx.application import Sphinx
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.util import logging
@@ -81,9 +81,64 @@ def html_to_markdown_converter(html_content):
     ).convert(html_content)
 
 
+# Module-level function for multiprocessing
+def _process_single_html_file(args: Tuple[str, str, List[str], List[str]]) -> Tuple[str, str, str]:
+    """
+    Process a single HTML file and generate markdown.
+    This is at module level so it can be pickled for multiprocessing.
+
+    Args:
+        args: Tuple of (html_file_path, outdir_path, exclude_patterns, selectors)
+
+    Returns:
+        Tuple of (status, relative_path, optional_message)
+        status: 'success', 'skipped', or 'error'
+    """
+    html_file_str, outdir_str, exclude_patterns, selectors = args
+
+    try:
+        from pathlib import Path
+        from bs4 import BeautifulSoup
+
+        html_file = Path(html_file_str)
+        outdir = Path(outdir_str)
+
+        # Check if file should be excluded
+        rel_path = html_file.relative_to(outdir)
+        if any(pattern in str(rel_path) for pattern in exclude_patterns):
+            return ('skipped', str(rel_path), '')
+
+        # Read HTML
+        html_content = html_file.read_text(encoding='utf-8')
+
+        # Extract main content using BeautifulSoup
+        soup = BeautifulSoup(html_content, 'html.parser')
+
+        main_content = None
+        for selector in selectors:
+            main_content = soup.select_one(selector)
+            if main_content:
+                break
+
+        if not main_content:
+            return ('skipped', str(rel_path), 'No main content found')
+
+        # Convert to markdown
+        markdown_content = html_to_markdown_converter(str(main_content))
+
+        # Write .md file alongside .html
+        md_file = html_file.with_suffix('.md')
+        md_file.write_text(markdown_content, encoding='utf-8')
+
+        return ('success', str(rel_path), '')
+
+    except Exception as e:
+        return ('error', str(rel_path), str(e))
+
+
 def generate_markdown_files(app: Sphinx, exception):
     """
-    Post-build hook to generate .md files for each .html file
+    Post-build hook to generate .md files for each .html file (parallelized)
     """
     if exception is not None:
         return
@@ -101,64 +156,64 @@ def generate_markdown_files(app: Sphinx, exception):
         logger.warning('AI Assistant: Cannot generate markdown files. Install dependencies: pip install beautifulsoup4 markdownify')
         return
 
+    import time
+    start_time = time.time()
+
     outdir = Path(builder.outdir)
     exclude_patterns = app.config.ai_assistant_markdown_exclude_patterns
 
     # Get list of HTML files
     html_files = list(outdir.rglob('*.html'))
-    generated_count = 0
-    skipped_count = 0
 
     logger.info(f'AI Assistant: Generating markdown files for {len(html_files)} HTML files...')
 
-    for html_file in html_files:
-        # Check if file should be excluded
-        rel_path = html_file.relative_to(outdir)
-        if any(pattern in str(rel_path) for pattern in exclude_patterns):
-            skipped_count += 1
-            continue
+    # Common selectors to try
+    selectors = [
+        'article[role="main"]',   # Furo theme
+        'div[role="main"]',       # Many themes
+        'div.document',           # Classic theme
+        'main',                   # Generic HTML5
+        'div.body',               # Older themes
+    ]
 
-        try:
-            # Read HTML
-            html_content = html_file.read_text(encoding='utf-8')
+    # Prepare arguments for parallel processing
+    args_list = [
+        (str(html_file), str(outdir), exclude_patterns, selectors)
+        for html_file in html_files
+    ]
 
-            # Extract main content using BeautifulSoup
-            soup = BeautifulSoup(html_content, 'html.parser')
+    # Process in parallel using ProcessPoolExecutor
+    from concurrent.futures import ProcessPoolExecutor, as_completed
+    import multiprocessing
 
-            # Try different selectors based on common Sphinx themes
-            selectors = [
-                'article[role="main"]',   # Furo theme
-                'div[role="main"]',       # Many themes
-                'div.document',           # Classic theme
-                'main',                   # Generic HTML5
-                'div.body',               # Older themes
-            ]
+    # Use number of CPU cores, but cap at reasonable limit
+    max_workers = min(multiprocessing.cpu_count(), 8)
 
-            main_content = None
-            for selector in selectors:
-                main_content = soup.select_one(selector)
-                if main_content:
-                    break
+    generated_count = 0
+    skipped_count = 0
+    error_count = 0
 
-            if not main_content:
-                logger.warning(f'AI Assistant: Could not find main content in {rel_path}')
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        futures = [executor.submit(_process_single_html_file, args) for args in args_list]
+
+        for future in as_completed(futures):
+            result = future.result()
+            status, rel_path, message = result
+
+            if status == 'success':
+                generated_count += 1
+            elif status == 'skipped':
                 skipped_count += 1
-                continue
+                if message:
+                    logger.debug(f'AI Assistant: {message} in {rel_path}')
+            elif status == 'error':
+                error_count += 1
+                logger.warning(f'AI Assistant: Failed to generate markdown for {rel_path}: {message}')
 
-            # Convert to markdown
-            markdown_content = html_to_markdown_converter(str(main_content))
-
-            # Write .md file alongside .html
-            md_file = html_file.with_suffix('.md')
-            md_file.write_text(markdown_content, encoding='utf-8')
-
-            generated_count += 1
-
-        except Exception as e:
-            logger.warning(f'AI Assistant: Failed to generate markdown for {rel_path}: {e}')
-            skipped_count += 1
-
-    logger.info(f'AI Assistant: Generated {generated_count} markdown files, skipped {skipped_count}')
+    elapsed = time.time() - start_time
+    logger.info(f'AI Assistant: Generated {generated_count} markdown files, '
+                f'skipped {skipped_count}, errors {error_count} '
+                f'in {elapsed:.1f} seconds (using {max_workers} workers)')
 
 
 def generate_llms_txt(app: Sphinx, exception):
@@ -205,12 +260,6 @@ def generate_llms_txt(app: Sphinx, exception):
 def setup(app: Sphinx) -> Dict[str, Any]:
     """
     Setup function for the Sphinx extension.
-
-    Args:
-        app: The Sphinx application instance
-
-    Returns:
-        Extension metadata
     """
     # Enabling extension
     app.add_config_value('ai_assistant_enabled', True, 'html')
@@ -250,14 +299,6 @@ def setup(app: Sphinx) -> Dict[str, Any]:
             'url_template': 'https://chatgpt.com/?q={prompt}',
             'prompt_template': 'Read {url} so I can ask questions about it.',
         },
-        'custom': {
-            'enabled': False,
-            'label': 'Custom AI',
-            'description': 'Open AI chat with this page context',
-            'icon': 'comment-discussion.svg',
-            'url_template': 'https://your-ai.com/chat?q={prompt}',
-            'prompt_template': 'Read {url} and answer my questions about it.',
-        }
     }, 'html')
 
     # MCP tools configuration
@@ -306,9 +347,6 @@ def add_ai_assistant_context(app: Sphinx, pagename: str, templatename: str,
                              context: Dict, doctree) -> None:
     """
     Add AI assistant context to the page template context.
-
-    This function is called for each page being rendered and adds
-    the necessary context variables for the AI assistant dropdown.
     """
     if not app.config.ai_assistant_enabled:
         return
