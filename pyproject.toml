@@ -43,7 +43,8 @@ Repository = "https://github.com/mlazag/sphinx-ai-assistant"
 Issues = "https://github.com/mlazag/sphinx-ai-assistant/issues"
 
 [tool.setuptools]
-packages = ["sphinx_ai_assistant"]
+packages = ["sphinx_ai_assistant", "sphinx_ai_assistant.static"]
+include-package-data = true
 
 [tool.setuptools.package-data]
 sphinx_ai_assistant = ["static/*.css", "static/*.js", "static/*.svg"]
