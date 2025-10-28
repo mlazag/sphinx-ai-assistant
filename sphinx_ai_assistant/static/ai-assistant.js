@@ -409,21 +409,8 @@
     // Get markdown URL for the current page
     function getMarkdownUrl() {
         const currentUrl = window.location.href;
-        const config = window.AI_ASSISTANT_CONFIG || {};
 
-        // If we're viewing locally (file:// protocol) and have a base URL configured,
-        // construct the public URL instead
-        if (currentUrl.startsWith('file://') && config.baseUrl) {
-            // Extract the relative path from the file URL
-            const pathMatch = currentUrl.match(/\/((?:[\w-]+\/)*[\w-]+\.html)$/);
-            if (pathMatch) {
-                const relativePath = pathMatch[1].replace(/\.html$/, '.md');
-                return `${config.baseUrl.replace(/\/$/, '')}/${relativePath}`;
-            }
-        }
-
-        // For production URLs or when no base URL is configured,
-        // just replace .html with .md in the current URL
+        // Replace .html with .md in the current URL
         if (currentUrl.endsWith('.html')) {
             return currentUrl.replace(/\.html$/, '.md');
         } else if (currentUrl.endsWith('/')) {

@@ -302,7 +302,7 @@ def setup(app: Sphinx) -> Dict[str, Any]:
     return {
         'version': '0.1.0',
         'parallel_read_safe': True,
-        'parallel_write_safe': False,
+        'parallel_write_safe': True,
     }
 
 
