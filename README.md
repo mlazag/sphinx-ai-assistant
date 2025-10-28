@@ -14,7 +14,6 @@ A Sphinx extension that adds AI-powered features to documentation pages, making 
 ### Integration with AI tools
 - **Direct AI Chat Links**: Open ChatGPT or Claude with pre-filled documentation context
 - **Smart Content Strategy**: Uses pre-generated markdown files for clean, unlimited-length context
-- **JavaScript Fallback**: Works even without build-time markdown generation
 - **Customizable AI Providers**: Built-in support for Claude, ChatGPT, and custom AI services
 - **No Backend Required**: Pure static files, works on any hosting
 - **MCP (Model Context Protocol) integration**: Connect VS Code and Claude to your MCP
@@ -260,21 +259,16 @@ sphinx-build -b html docs/ docs/_build/html
 
 2. Check browser console for errors
 
-3. Verify JavaScript fallback is working
+### Markdown features not working
 
-### Content truncated
-
-This happens when:
-- `.md` file doesn't exist AND
-- Page is longer than `ai_assistant_max_content_length`
+This happens when `.md` file doesn't exist.
 
 Solution: Generate `.md` files with `ai_assistant_generate_markdown = True`
 
 ## Performance
 
 ### Build Time
-- Adds ~1-2 seconds per 100 pages for markdown generation
-- Negligible impact for most projects
+- Adds few seconds per 100 pages for markdown generation
 
 ### Runtime
 - **With .md files:** Instant (just opens URL)
@@ -289,15 +283,15 @@ Solution: Generate `.md` files with `ai_assistant_generate_markdown = True`
 
 MIT License - see LICENSE file for details
 
+## Questions or Issues?
+
+- Check the [example_conf.py](example_conf.py)
+- Open an [issue](https://github.com/mlazag/sphinx-ai-assistant/issues)
+- Start a [discussion](https://github.com/mlazag/sphinx-ai-assistant/discussions)
+
 ## Acknowledgments
 
 - Built with [Turndown.js](https://github.com/mixmark-io/turndown) for HTML to Markdown conversion
 - Uses [BeautifulSoup4](https://www.crummy.com/software/BeautifulSoup/) and [markdownify](https://github.com/matthewwithanm/python-markdownify) for build-time conversion
 - Designed to work seamlessly with the [Furo](https://github.com/pradyunsg/furo) Sphinx theme
 - Inspired by the need to make documentation more AI-friendly
-
-## Questions or Issues?
-
-- Check the [example_conf.py](example_conf.py)
-- Open an [issue](https://github.com/mlazag/sphinx-ai-assistant/issues)
-- Start a [discussion](https://github.com/mlazag/sphinx-ai-assistant/discussions)
