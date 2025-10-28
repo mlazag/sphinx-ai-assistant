@@ -337,7 +337,7 @@ def setup(app: Sphinx) -> Dict[str, Any]:
     app.connect('build-finished', generate_llms_txt)
 
     return {
-        'version': '0.1.0',
+        'version': '0.1.1',
         'parallel_read_safe': True,
         'parallel_write_safe': True,
     }
