@@ -410,15 +410,18 @@
     function getMarkdownUrl() {
         const currentUrl = window.location.href;
 
+        // Remove anchor/hash from URL first
+        const urlWithoutHash = currentUrl.split('#')[0];
+
         // Replace .html with .md in the current URL
-        if (currentUrl.endsWith('.html')) {
-            return currentUrl.replace(/\.html$/, '.md');
-        } else if (currentUrl.endsWith('/')) {
+        if (urlWithoutHash.endsWith('.html')) {
+            return urlWithoutHash.replace(/\.html$/, '.md');
+        } else if (urlWithoutHash.endsWith('/')) {
             // For directory-style URLs, look for index.md
-            return currentUrl + 'index.md';
+            return urlWithoutHash + 'index.md';
         } else {
             // Assume it's a page without extension
-            return currentUrl + '.md';
+            return urlWithoutHash + '.md';
         }
     }
 
